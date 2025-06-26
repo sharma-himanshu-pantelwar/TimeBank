@@ -1,9 +1,9 @@
 package persistance
 
 import (
-	user "djson/internal/core/user"
-	hashpassword "djson/pkg/hashPassword"
 	"fmt"
+	user "timebank/internal/core/user"
+	hashpassword "timebank/pkg/hashPassword"
 )
 
 // * 1. Create User_Repo

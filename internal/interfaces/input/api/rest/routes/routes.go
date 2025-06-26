@@ -1,9 +1,9 @@
 package routes
 
 import (
-	userhandler "djson/internal/interfaces/input/api/rest/handler"
-	"djson/internal/interfaces/input/api/rest/middleware"
 	"net/http"
+	userhandler "timebank/internal/interfaces/input/api/rest/handler"
+	"timebank/internal/interfaces/input/api/rest/middleware"
 
 	"github.com/go-chi/chi/v5"
 )

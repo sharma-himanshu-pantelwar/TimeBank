@@ -1,19 +1,19 @@
 package main
 
 import (
-	"djson/internal/adaptors/persistance"
-	"djson/internal/config"
 	"net/http"
 	"time"
+	"timebank/internal/adaptors/persistance"
+	"timebank/internal/config"
 
-	userhandler "djson/internal/interfaces/input/api/rest/handler"
-	"djson/internal/interfaces/input/api/rest/middleware"
-	"djson/internal/interfaces/input/api/rest/routes"
-	user "djson/internal/usecase"
-	"djson/pkg/migrate"
 	"fmt"
 	"log"
 	"os"
+	userhandler "timebank/internal/interfaces/input/api/rest/handler"
+	"timebank/internal/interfaces/input/api/rest/middleware"
+	"timebank/internal/interfaces/input/api/rest/routes"
+	user "timebank/internal/usecase"
+	"timebank/pkg/migrate"
 )
 
 func main() {

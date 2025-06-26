@@ -2,8 +2,8 @@ package persistance
 
 import (
 	"database/sql"
-	"djson/internal/config"
 	"fmt"
+	"timebank/internal/config"
 
 	_ "github.com/lib/pq"
 )

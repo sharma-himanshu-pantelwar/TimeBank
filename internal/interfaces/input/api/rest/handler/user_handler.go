@@ -1,11 +1,11 @@
 package userhandler
 
 import (
-	"djson/internal/core/user"
-	userservice "djson/internal/usecase"
 	"encoding/json"
 	"net/http"
 	"time"
+	"timebank/internal/core/user"
+	userservice "timebank/internal/usecase"
 )
 
 type UserHandler struct {

@@ -1,13 +1,13 @@
 package userservice
 
 import (
-	"djson/internal/adaptors/persistance"
-	"djson/internal/core/session"
-	"djson/internal/core/user"
-	"djson/pkg/generatejwt"
-	hashpassword "djson/pkg/hashPassword"
 	"fmt"
 	"time"
+	"timebank/internal/adaptors/persistance"
+	"timebank/internal/core/session"
+	"timebank/internal/core/user"
+	"timebank/pkg/generatejwt"
+	hashpassword "timebank/pkg/hashPassword"
 
 	"golang.org/x/crypto/bcrypt"
 )

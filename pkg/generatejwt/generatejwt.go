@@ -1,9 +1,9 @@
 package generatejwt
 
 import (
-	config "djson/internal/config"
-	"djson/internal/core/session"
 	"time"
+	config "timebank/internal/config"
+	"timebank/internal/core/session"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"

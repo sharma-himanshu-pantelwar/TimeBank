@@ -1,8 +1,8 @@
 package persistance
 
 import (
-	"djson/internal/core/session"
 	"fmt"
+	"timebank/internal/core/session"
 )
 
 // SessionRepo is a struct which has db as pointer to Database

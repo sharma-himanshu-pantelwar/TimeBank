@@ -3,9 +3,9 @@ package migrate
 import (
 	"context"
 	"database/sql"
-	"djson/pkg/sqlparser"
 	"fmt"
 	"os"
+	"timebank/pkg/sqlparser"
 )
 
 type Migrate struct {

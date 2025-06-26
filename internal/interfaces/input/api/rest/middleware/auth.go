@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"context"
-	"djson/pkg/generatejwt"
 	"net/http"
+	"timebank/pkg/generatejwt"
 )
 
 func Authenticate(next http.Handler) http.Handler {
