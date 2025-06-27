@@ -38,7 +38,7 @@ func main() {
 
 	err = migrate.RunMigrations()
 	if err != nil {
-		log.Fatalf("failed to run migrations")
+		log.Fatalf("failed to run migrations\n %v", err)
 
 	}
 
