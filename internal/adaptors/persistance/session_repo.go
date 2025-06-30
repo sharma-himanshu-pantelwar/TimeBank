@@ -36,7 +36,7 @@ func (u *SessionRepo) DeleteSession(uid int) error {
 }
 func (u *SessionRepo) GetSession(id string) (session.Session, error) {
 	var newSess session.Session
-	query := "select id,user_id,token_hash,expires_at,issued_at from sessions where id=$1"
+	query := "select session_id,user_id,token_hash,expires_at,issued_at from auth_sessions where session_id=$1"
 	err := u.db.db.QueryRow(query, id).Scan(&newSess.Id, &newSess.Uid, &newSess.TokenHash, &newSess.ExpiresAt, &newSess.IssuedAt)
 	if err != nil {
 		return session.Session{}, err
