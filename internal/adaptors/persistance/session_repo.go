@@ -27,7 +27,7 @@ func (u *SessionRepo) CreateSession(session session.Session) error {
 }
 
 func (u *SessionRepo) DeleteSession(uid int) error {
-	query := "delete from sessions where user_id=$1"
+	query := "delete from auth_sessions where user_id=$1"
 	_, err := u.db.db.Query(query, uid)
 	if err != nil {
 		return err
