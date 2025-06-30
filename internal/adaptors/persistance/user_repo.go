@@ -43,8 +43,20 @@ func (u *UserRepo) GetUser(username string) (user.User, error) {
 	var newUser user.User
 	// fmt.Println(newUser)
 	// u=>UserRepo      u.db=>Database type struct inside UserRepo   u.db.db=>Actual database inside the database struct(*sql.db)
-	query := "select uid,username,password,email,location,availability,available_credits from users where username=$1"
-	err := u.db.db.QueryRow(query, username).Scan(&newUser.Id, &newUser.Username, &newUser.Password)
+	query := "select id,username,password,email,location,availability,available_credits from users where username=$1"
+	err := u.db.db.QueryRow(query, username).Scan(&newUser.Id, &newUser.Username, &newUser.Password, &newUser.Email, &newUser.Location, &newUser.Availability, &newUser.AvailableCredits)
+	if err != nil {
+		return user.User{}, err
+	}
+	// fmt.Println(newUser)
+	return newUser, nil
+}
+func (u *UserRepo) GetUserByEmail(email string) (user.User, error) {
+	var newUser user.User
+	// fmt.Println(newUser)
+	// u=>UserRepo      u.db=>Database type struct inside UserRepo   u.db.db=>Actual database inside the database struct(*sql.db)
+	query := "select uid,username,password,email,location,availability,available_credits from users where email=$1"
+	err := u.db.db.QueryRow(query, email).Scan(&newUser.Id, &newUser.Username, &newUser.Password)
 	if err != nil {
 		return user.User{}, err
 	}

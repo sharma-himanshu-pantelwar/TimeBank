@@ -11,6 +11,7 @@ type User struct {
 }
 type LoginRequestUser struct {
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"` //omit later
 	Id       int    `json:"id"`
 }

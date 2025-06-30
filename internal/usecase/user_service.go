@@ -47,18 +47,10 @@ func (u *UserService) LoginUser(requestUser user.LoginRequestUser) (LoginRespons
 	foundUser, err := u.userRepo.GetUser(requestUser.Username) //this will find user based on their username
 	// fmt.Println("Found user :               ", foundUser) returns username pass uid
 	if err != nil {
+		fmt.Println(err)
 		return loginResponse, fmt.Errorf("invalid username")
 	}
 	loginResponse.FoundUser = foundUser
-
-	// fmt.Println("Login response ", loginResponse)
-	// fmt.Println("loginResposeFound user ", loginResponse.FoundUser)
-	// fmt.Println("Found user.Uid   ", foundUser.Uid)
-
-	// fmt.Println("Request user   ", requestUser)
-	// fmt.Println("Request pass   ", requestUser.Password)
-
-	// fmt.Println("Found user is : ", foundUser)
 
 	if err := matchPassword(foundUser, requestUser.Password); err != nil {
 		return loginResponse, fmt.Errorf("invalid username or password")
