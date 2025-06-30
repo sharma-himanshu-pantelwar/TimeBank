@@ -68,8 +68,8 @@ func (u *UserRepo) GetUserById(id int) (user.GetUserProfile, error) {
 
 	// fmt.Println(newUser)
 	// u=>UserRepo      u.db=>Database type struct inside UserRepo   u.db.db=>Actual database inside the database struct(*sql.db)
-	query := "select uid,email,username from users where uid=$1"
-	err := u.db.db.QueryRow(query, id).Scan(&newUser.Uid, &newUser.Email, &newUser.Username)
+	query := "select id,email,username,location,availability,available_credits from users where id=$1"
+	err := u.db.db.QueryRow(query, id).Scan(&newUser.Uid, &newUser.Email, &newUser.Username, &newUser.Location, &newUser.Availability, &newUser.AvailableCredits)
 	// resultUser.Email=newUser.Email
 	// resultUser.Uid=newUser.Uid
 	// resultUser.Username=newUser.Username

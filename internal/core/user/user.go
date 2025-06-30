@@ -20,5 +20,8 @@ type GetUserProfile struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	// Password string `json:"password"` //omit later
-	Uid int `json:"uid"`
+	Uid              int     `json:"uid"`
+	Location         string  `json:"location"`
+	Availability     bool    `json:"availability"`
+	AvailableCredits float64 `json:"availableCredits"`
 }
