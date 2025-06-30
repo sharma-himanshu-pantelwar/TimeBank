@@ -64,7 +64,7 @@ func (u *UserService) LoginUser(requestUser user.LoginRequestUser) (LoginRespons
 		return loginResponse, fmt.Errorf("invalid username or password")
 	}
 
-	tokenString, tokenExpire, err := generatejwt.GenerateJWT(foundUser.Uid)
+	tokenString, tokenExpire, err := generatejwt.GenerateJWT(foundUser.Id)
 	loginResponse.TokenString = tokenString
 	loginResponse.TokenExpire = tokenExpire
 
@@ -72,7 +72,7 @@ func (u *UserService) LoginUser(requestUser user.LoginRequestUser) (LoginRespons
 		return loginResponse, fmt.Errorf("failed to generate jwt token")
 	}
 
-	session, err := generatejwt.GenerateSession(foundUser.Uid)
+	session, err := generatejwt.GenerateSession(foundUser.Id)
 	loginResponse.Session = session
 	if err != nil {
 		return loginResponse, fmt.Errorf("failed to generate session")

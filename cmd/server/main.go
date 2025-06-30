@@ -50,8 +50,8 @@ func main() {
 
 	router := routes.InitRoutes(&userHandler)
 
-	// instead of 100ms, 1s is used since all requests were returning 504
-	timeoutWrappedRouter := middleware.TimeoutMiddleware(time.Millisecond*100, router)
+	//1s is to be replaced with 100ms
+	timeoutWrappedRouter := middleware.TimeoutMiddleware(time.Second*1, router)
 
 	cfg, err := config.LoadConfig()
 	if err != nil {

@@ -21,19 +21,19 @@ func NewUserRepo(d *Database) UserRepo {
 
 // Create user repo
 func (u *UserRepo) CreateUser(newUser user.User) (user.User, error) {
-	var uid int
-	query := "insert into users(username,email,password)values($1, $2, $3) returning uid"
+	var id int
+	query := "insert into users(username,email,password,location,availability,available_credits)values($1, $2, $3, $4, $5, $6) returning id"
 	hashPass, err := hashpassword.HashPassword(newUser.Password)
 	if err != nil {
 		fmt.Println("Error hashing password")
 	}
 
-	err = u.db.db.QueryRow(query, newUser.Username, newUser.Email, hashPass).Scan(&uid)
+	err = u.db.db.QueryRow(query, newUser.Username, newUser.Email, hashPass, newUser.Location, newUser.Availability, newUser.AvailableCredits).Scan(&id)
 	if err != nil {
 		return user.User{}, err
 	}
 
-	newUser.Uid = uid
+	newUser.Id = id
 	// send values to db
 	return newUser, nil
 
@@ -43,8 +43,8 @@ func (u *UserRepo) GetUser(username string) (user.User, error) {
 	var newUser user.User
 	// fmt.Println(newUser)
 	// u=>UserRepo      u.db=>Database type struct inside UserRepo   u.db.db=>Actual database inside the database struct(*sql.db)
-	query := "select uid,username,password from users where username=$1"
-	err := u.db.db.QueryRow(query, username).Scan(&newUser.Uid, &newUser.Username, &newUser.Password)
+	query := "select uid,username,password,email,location,availability,available_credits from users where username=$1"
+	err := u.db.db.QueryRow(query, username).Scan(&newUser.Id, &newUser.Username, &newUser.Password)
 	if err != nil {
 		return user.User{}, err
 	}

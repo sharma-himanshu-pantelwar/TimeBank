@@ -29,7 +29,7 @@ type Claims struct {
 }
 
 func GenerateJWT(uid int) (string, time.Time, error) {
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(30 * time.Minute)
 	claims := &Claims{
 		Uid: uid,
 		StandardClaims: jwt.StandardClaims{
@@ -46,7 +46,7 @@ func GenerateJWT(uid int) (string, time.Time, error) {
 
 func GenerateSession(userId int) (session.Session, error) {
 	tokenId := uuid.New()
-	expiresAt := time.Now().Add(2 * time.Hour)
+	expiresAt := time.Now().Add(5 * time.Hour)
 	issuedAt := time.Now()
 	hashToken, err := bcrypt.GenerateFromPassword([]byte(tokenId.String()), bcrypt.DefaultCost)
 	if err != nil {
