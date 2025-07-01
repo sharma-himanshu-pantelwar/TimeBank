@@ -2,6 +2,7 @@ package persistance
 
 import (
 	"fmt"
+	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/skills"
 	user "timebank/internal/core/user"
 	hashpassword "timebank/pkg/hashPassword"
@@ -198,4 +199,15 @@ func (u *UserRepo) DectivateSkill(userId int, skillId int) (skills.Skills, error
 	}
 
 	return deactivatedSkill, nil
+}
+func (u *UserRepo) CreateSession(userId int, fromUserId int) (helpsession.HelpSession, error) {
+	var createdSession helpsession.HelpSession
+	var id int
+	query := "insert into helping_sessions(sender_id,receiver_id,skill_shared_id,time_taken,started_at,completed_at)values($1, $2, $3, $4, $5, $6) returning id;"
+	err := u.db.db.QueryRow(query, fromUserId, userId, &createdSession.SkillSharedId, &createdSession.TimeTaken, &createdSession.StartedAt, &createdSession.CompletedAt).Scan(&id)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	return createdSession, nil
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 	"timebank/internal/adaptors/persistance"
+	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/session"
 	"timebank/internal/core/skills"
 	"timebank/internal/core/user"
@@ -168,4 +169,10 @@ func (u *UserService) SetInactive(userId int, skillId int) (skills.Skills, error
 	deactivatedSkill, err := u.userRepo.DectivateSkill(userId, skillId)
 	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
 	return deactivatedSkill, err
+}
+func (u *UserService) CreateSession(userId int, fromUserId int) (helpsession.HelpSession, error) {
+	// call CreateUser function
+	createdSession, err := u.userRepo.CreateSession(userId, fromUserId)
+	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
+	return createdSession, err
 }

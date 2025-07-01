@@ -61,11 +61,11 @@ sender_id INT REFERENCES users(id) ON DELETE SET NULL,
 receiver_id INT REFERENCES users(id) ON DELETE SET NULL,
 skill_shared_id INT REFERENCES skills(skill_id),
 time_taken NUMERIC(4,2) CHECK(time_taken >= 0),
-session_status session_status_types DEFAULT 'created',
-scheduled_at TIMESTAMPTZ,
+-- session_status session_status_types DEFAULT 'created',
+-- scheduled_at TIMESTAMPTZ,
 started_at TIMESTAMPTZ,
 completed_at TIMESTAMPTZ,
-created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+-- created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Feedback

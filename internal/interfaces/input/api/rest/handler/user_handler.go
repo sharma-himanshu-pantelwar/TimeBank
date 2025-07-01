@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/skills"
 	"timebank/internal/core/user"
 	userservice "timebank/internal/usecase"
@@ -390,21 +391,23 @@ func (u *UserHandler) SetInactive(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *UserHandler) CreateSession(w http.ResponseWriter, r *http.Request) {
+	var sessionData helpsession.HelpSession
 	userId, ok := r.Context().Value("user").(int)
+
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
 		return
 	}
 
-	skillIdStr := chi.URLParam(r, "skillId")
-	skillId, err := strconv.Atoi(skillIdStr)
-	if err != nil {
-		http.Error(w, "Invalid skill ID", http.StatusBadRequest)
+	if err := json.NewDecoder(r.Body).Decode(&sessionData); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
-	deactivateSkillResponse, err := u.userService.SetInactive(userId, skillId)
+	// userId-> logged in user id
+	deactivateSkillResponse, err := u.userService.CreateSession(userId, sessionData.FromUser)
 	if err != nil {
 		fmt.Println("Error after calling FindPersonWithSkill from handler")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -33,7 +33,7 @@ func InitRoutes(userHandler *userhandler.UserHandler) http.Handler {
 	router.Route("/v1/sessions", func(r chi.Router) {
 		r.Use(middleware.Authenticate)
 		// r.Post("/request", userHandler.RequestSession)
-		r.Post("/create-session", userHandler.CreateSession)
+		r.Post("/create", userHandler.CreateSession)
 
 	})
 
