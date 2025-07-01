@@ -2,6 +2,7 @@ package persistance
 
 import (
 	"fmt"
+	"timebank/internal/core/skills"
 	user "timebank/internal/core/user"
 	hashpassword "timebank/pkg/hashPassword"
 )
@@ -78,4 +79,52 @@ func (u *UserRepo) GetUserById(id int) (user.GetUserProfile, error) {
 	}
 	// fmt.Println(newUser)
 	return newUser, nil
+}
+
+func (u *UserRepo) CreateSkill(userId int, newSkill skills.Skills) (skills.Skills, error) {
+	var id int
+	query := "insert into skills(user_id,name,description,skill_status,skill_service_type)values($1, $2, $3, $4, $5) returning skill_id"
+
+	// i need to get the user id from the authenticated user
+
+	err := u.db.db.QueryRow(query, userId, newSkill.Name, newSkill.Description, newSkill.Status, newSkill.ServiceType).Scan(&id)
+	if err != nil {
+		return skills.Skills{}, err
+	}
+
+	newSkill.Id = id
+	// send values to db
+	return newSkill, nil
+
+}
+func (u *UserRepo) FindSkilledPerson(userId int, skillName string) ([]user.GetUsersWithSkills, error) {
+
+	var people []user.GetUsersWithSkills
+	query := "select users.id, users.username, users.email, skills.name, skills.description from users JOIN skills on users.id=skills.user_id where skills.name ILIKE $1;"
+
+	rows, err := u.db.db.Query(query, "%"+skillName+"%")
+
+	if err != nil {
+		fmt.Println("Error while running query        :             ", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var person user.GetUsersWithSkills
+		if err := rows.Scan(&person.Id, &person.Username, &person.Email, &person.SkillName, &person.SkillDescription); err != nil {
+			fmt.Println("Error while scanning various rows")
+			return nil, err
+		}
+		people = append(people, person)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Println("Error before returning people[]")
+		return nil, err
+	}
+	// fmt.Println(people)  //empty array would go in case of no users found with that skill
+	return people, nil
+
 }

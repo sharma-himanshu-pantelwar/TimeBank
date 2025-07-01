@@ -25,3 +25,11 @@ type GetUserProfile struct {
 	Availability     bool    `json:"availability"`
 	AvailableCredits float64 `json:"availableCredits"`
 }
+
+type GetUsersWithSkills struct {
+	Id               int    `json:"userid"`
+	Username         string `json:"username"`
+	Email            string `json:"email"`
+	SkillName        string `json:"skillname"`
+	SkillDescription string `json:"skilldescription"`
+}

@@ -2,10 +2,14 @@ package userhandler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
+	"timebank/internal/core/skills"
 	"timebank/internal/core/user"
 	userservice "timebank/internal/usecase"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type UserHandler struct {
@@ -175,4 +179,64 @@ func (u *UserHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{"message": "cookie refreshed succesfully"})
+}
+
+// Register Skills
+func (u *UserHandler) AddSkills(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value("user").(int)
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
+		return
+	}
+	var newSkills skills.Skills
+
+	if err := json.NewDecoder(r.Body).Decode(&newSkills); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	registeredSkill, err := u.userService.RegisterSkill(userId, newSkills)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	skill := registeredSkill
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(skill)
+}
+
+func (u *UserHandler) FindSkilledPerson(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value("user").(int)
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
+		return
+	}
+
+	skill := chi.URLParam(r, "skill")
+	// 	var newSkills skills.Skills
+
+	// 	if err := json.NewDecoder(r.Body).Decode(&newSkills); err != nil {
+	// 		w.WriteHeader(http.StatusBadRequest)
+	// 		w.Write([]byte(err.Error()))
+	// 		return
+	// 	}
+	foundUsersWithSkill, err := u.userService.FindPersonWithSkill(userId, skill)
+	if err != nil {
+		fmt.Println("Error after calling FindPersonWithSkill from handler")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	response := foundUsersWithSkill
+	if len(foundUsersWithSkill) == 0 {
+		response = []user.GetUsersWithSkills{}
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }

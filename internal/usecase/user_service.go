@@ -5,6 +5,7 @@ import (
 	"time"
 	"timebank/internal/adaptors/persistance"
 	"timebank/internal/core/session"
+	"timebank/internal/core/skills"
 	"timebank/internal/core/user"
 	"timebank/pkg/generatejwt"
 	hashpassword "timebank/pkg/hashPassword"
@@ -127,4 +128,16 @@ func matchSessionToken(id string, tokenHash string) error {
 		return err
 	}
 	return nil
+}
+
+func (u *UserService) RegisterSkill(userId int, skill skills.Skills) (skills.Skills, error) {
+	// call CreateUser function
+	newSkill, err := u.userRepo.CreateSkill(userId, skill)
+	return newSkill, err
+}
+func (u *UserService) FindPersonWithSkill(userId int, skill string) ([]user.GetUsersWithSkills, error) {
+	// call CreateUser function
+	foundUsers, err := u.userRepo.FindSkilledPerson(userId, skill)
+	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
+	return foundUsers, err
 }
