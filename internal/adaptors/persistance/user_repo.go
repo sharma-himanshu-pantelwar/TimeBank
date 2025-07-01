@@ -97,6 +97,7 @@ func (u *UserRepo) CreateSkill(userId int, newSkill skills.Skills) (skills.Skill
 	return newSkill, nil
 
 }
+
 func (u *UserRepo) FindSkilledPerson(userId int, skillName string) ([]user.GetUsersWithSkills, error) {
 
 	var people []user.GetUsersWithSkills
@@ -127,4 +128,23 @@ func (u *UserRepo) FindSkilledPerson(userId int, skillName string) ([]user.GetUs
 	// fmt.Println(people)  //empty array would go in case of no users found with that skill
 	return people, nil
 
+}
+
+func (u *UserRepo) RenameSkill(userId int, newSkillName string, newSkillDescription string, skillId int) (skills.Skills, error) {
+
+	var updatedSkill skills.Skills
+	query := "update skills set name=$1, description=$2 where skills.skill_id= $3 and user_id=$4 returning skill_id,user_id,name,description,skill_status,skill_service_type;"
+	err := u.db.db.QueryRow(query, newSkillName, newSkillDescription, skillId, userId).Scan(
+		&updatedSkill.Id,
+		&updatedSkill.UserId,
+		&updatedSkill.Name,
+		&updatedSkill.Description,
+		&updatedSkill.Status,
+		&updatedSkill.ServiceType,
+	)
+	if err != nil {
+		return skills.Skills{}, err
+	}
+
+	return updatedSkill, nil
 }

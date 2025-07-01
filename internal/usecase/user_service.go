@@ -141,3 +141,9 @@ func (u *UserService) FindPersonWithSkill(userId int, skill string) ([]user.GetU
 	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
 	return foundUsers, err
 }
+func (u *UserService) RenameSkill(userId int, newSkillName string, newSkillDescription string, skillId int) (skills.Skills, error) {
+	// call CreateUser function
+	renamedSkill, err := u.userRepo.RenameSkill(userId, newSkillName, newSkillDescription, skillId)
+	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
+	return renamedSkill, err
+}

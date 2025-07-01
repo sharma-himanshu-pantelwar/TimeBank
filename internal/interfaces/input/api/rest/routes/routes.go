@@ -17,10 +17,15 @@ func InitRoutes(userHandler *userhandler.UserHandler) http.Handler {
 	})
 	router.Route("/v1/user", func(r chi.Router) {
 		r.Use(middleware.Authenticate)
-		r.Post("/addskill", userHandler.AddSkills)
+
 		r.Get("/profile", userHandler.Profile)
 		r.Post("/logout", userHandler.Logout)
-		r.Get("/find-skill/{skill}", userHandler.FindSkilledPerson)
+	})
+	router.Route("/v1/skills", func(r chi.Router) {
+		r.Use(middleware.Authenticate)
+		r.Post("/add", userHandler.AddSkills)
+		r.Get("/find/{skill}", userHandler.FindSkilledPerson)
+		r.Patch("/rename/{skillId}", userHandler.RenameSkill)
 	})
 
 	return router

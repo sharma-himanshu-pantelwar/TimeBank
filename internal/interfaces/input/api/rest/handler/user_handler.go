@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 	"timebank/internal/core/skills"
 	"timebank/internal/core/user"
@@ -239,4 +240,48 @@ func (u *UserHandler) FindSkilledPerson(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+func (u *UserHandler) RenameSkill(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value("user").(int)
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
+		return
+	}
+
+	skillIdStr := chi.URLParam(r, "skillId")
+	skillId, err := strconv.Atoi(skillIdStr)
+	if err != nil {
+		http.Error(w, "Invalid skill ID", http.StatusBadRequest)
+		return
+	}
+	// 	var newSkills skills.Skills
+	type RenameRequest struct {
+		NewNameForSkill     string `json:"newName"`
+		NewDescriptionSkill string `json:"newDescription"`
+	}
+
+	var alteredSkill RenameRequest
+	if err := json.NewDecoder(r.Body).Decode(&alteredSkill); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	renamedSkillResponse, err := u.userService.RenameSkill(userId, alteredSkill.NewNameForSkill, alteredSkill.NewDescriptionSkill, skillId)
+	if err != nil {
+		fmt.Println("Error after calling FindPersonWithSkill from handler")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// response := foundUsersWithSkill
+	// if len(foundUsersWithSkill) == 0 {
+	// 	response = []user.GetUsersWithSkills{}
+	// }
+	// w.WriteHeader(http.StatusOK)
+	// w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(renamedSkillResponse)
 }
