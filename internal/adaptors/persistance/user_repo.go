@@ -100,9 +100,9 @@ func (u *UserRepo) CreateSkill(userId int, newSkill skills.Skills) (skills.Skill
 func (u *UserRepo) FindSkilledPerson(userId int, skillName string) ([]user.GetUsersWithSkills, error) {
 
 	var people []user.GetUsersWithSkills
-	query := "select users.id, users.username, users.email, skills.name, skills.description from users JOIN skills on users.id=skills.user_id where skills.name ILIKE $1;"
+	query := "select users.id, users.username, users.email, skills.name, skills.description from users JOIN skills on users.id=skills.user_id where skills.name ILIKE $1 and users.id != $2;"
 
-	rows, err := u.db.db.Query(query, "%"+skillName+"%")
+	rows, err := u.db.db.Query(query, "%"+skillName+"%", userId)
 
 	if err != nil {
 		fmt.Println("Error while running query        :             ", err)
