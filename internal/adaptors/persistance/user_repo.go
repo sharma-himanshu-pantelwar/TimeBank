@@ -148,3 +148,22 @@ func (u *UserRepo) RenameSkill(userId int, newSkillName string, newSkillDescript
 
 	return updatedSkill, nil
 }
+
+func (u *UserRepo) DeleteSkill(userId int, skillId int) (skills.Skills, error) {
+
+	var deletedSkill skills.Skills
+	query := "delete from  skills  where skill_id= $1 and user_id=$2 returning skill_id,user_id,name,description,skill_status,skill_service_type;"
+	err := u.db.db.QueryRow(query, skillId, userId).Scan(
+		&deletedSkill.Id,
+		&deletedSkill.UserId,
+		&deletedSkill.Name,
+		&deletedSkill.Description,
+		&deletedSkill.Status,
+		&deletedSkill.ServiceType,
+	)
+	if err != nil {
+		return skills.Skills{}, err
+	}
+
+	return deletedSkill, nil
+}

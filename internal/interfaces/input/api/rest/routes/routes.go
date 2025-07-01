@@ -26,6 +26,7 @@ func InitRoutes(userHandler *userhandler.UserHandler) http.Handler {
 		r.Post("/add", userHandler.AddSkills)
 		r.Get("/find/{skill}", userHandler.FindSkilledPerson)
 		r.Patch("/rename/{skillId}", userHandler.RenameSkill)
+		r.Delete("/delete/{skillId}", userHandler.DeleteSkill)
 	})
 
 	return router

@@ -147,3 +147,9 @@ func (u *UserService) RenameSkill(userId int, newSkillName string, newSkillDescr
 	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
 	return renamedSkill, err
 }
+func (u *UserService) DeleteSkill(userId int, skillId int) (skills.Skills, error) {
+	// call CreateUser function
+	deletedSkill, err := u.userRepo.DeleteSkill(userId, skillId)
+	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
+	return deletedSkill, err
+}
