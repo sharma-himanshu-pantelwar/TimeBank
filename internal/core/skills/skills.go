@@ -6,5 +6,4 @@ type Skills struct {
 	UserId      int    `json:"userId"`
 	Description string `json:"description"`
 	Status      string `json:"status"`
-	ServiceType string `json:"service_type"`
 }

@@ -83,11 +83,11 @@ func (u *UserRepo) GetUserById(id int) (user.GetUserProfile, error) {
 
 func (u *UserRepo) CreateSkill(userId int, newSkill skills.Skills) (skills.Skills, error) {
 	var id int
-	query := "insert into skills(user_id,name,description,skill_status,skill_service_type)values($1, $2, $3, $4, $5) returning skill_id"
+	query := "insert into skills(user_id,name,description,skill_status)values($1, $2, $3, $4) returning skill_id"
 
 	// i need to get the user id from the authenticated user
 
-	err := u.db.db.QueryRow(query, userId, newSkill.Name, newSkill.Description, newSkill.Status, newSkill.ServiceType).Scan(&id)
+	err := u.db.db.QueryRow(query, userId, newSkill.Name, newSkill.Description, newSkill.Status).Scan(&id)
 	if err != nil {
 		return skills.Skills{}, err
 	}
@@ -140,7 +140,6 @@ func (u *UserRepo) RenameSkill(userId int, newSkillName string, newSkillDescript
 		&updatedSkill.Name,
 		&updatedSkill.Description,
 		&updatedSkill.Status,
-		&updatedSkill.ServiceType,
 	)
 	if err != nil {
 		return skills.Skills{}, err
@@ -159,11 +158,46 @@ func (u *UserRepo) DeleteSkill(userId int, skillId int) (skills.Skills, error) {
 		&deletedSkill.Name,
 		&deletedSkill.Description,
 		&deletedSkill.Status,
-		&deletedSkill.ServiceType,
 	)
 	if err != nil {
 		return skills.Skills{}, err
 	}
 
 	return deletedSkill, nil
+}
+
+func (u *UserRepo) ActivateSkill(userId int, skillId int) (skills.Skills, error) {
+
+	var activatedSkill skills.Skills
+	query := "update skills  set skill_status='active' where skill_id= $1 and user_id=$2 returning skill_id,user_id,name,description,skill_status;"
+	err := u.db.db.QueryRow(query, skillId, userId).Scan(
+		&activatedSkill.Id,
+		&activatedSkill.UserId,
+		&activatedSkill.Name,
+		&activatedSkill.Description,
+		&activatedSkill.Status,
+	)
+	if err != nil {
+		return skills.Skills{}, err
+	}
+
+	return activatedSkill, nil
+}
+
+func (u *UserRepo) DectivateSkill(userId int, skillId int) (skills.Skills, error) {
+
+	var deactivatedSkill skills.Skills
+	query := "update skills  set skill_status='inactive' where skill_id= $1 and user_id=$2 returning skill_id,user_id,name,description,skill_status;"
+	err := u.db.db.QueryRow(query, skillId, userId).Scan(
+		&deactivatedSkill.Id,
+		&deactivatedSkill.UserId,
+		&deactivatedSkill.Name,
+		&deactivatedSkill.Description,
+		&deactivatedSkill.Status,
+	)
+	if err != nil {
+		return skills.Skills{}, err
+	}
+
+	return deactivatedSkill, nil
 }

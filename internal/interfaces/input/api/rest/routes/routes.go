@@ -27,6 +27,12 @@ func InitRoutes(userHandler *userhandler.UserHandler) http.Handler {
 		r.Get("/find/{skill}", userHandler.FindSkilledPerson)
 		r.Patch("/rename/{skillId}", userHandler.RenameSkill)
 		r.Delete("/delete/{skillId}", userHandler.DeleteSkill)
+		r.Post("/active/{skillId}", userHandler.SetActive)
+		r.Post("/inactive/{skillId}", userHandler.SetInactive)
+	})
+	router.Route("/v1/sessions", func(r chi.Router) {
+		r.Use(middleware.Authenticate)
+
 	})
 
 	return router

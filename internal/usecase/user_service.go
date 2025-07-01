@@ -135,21 +135,37 @@ func (u *UserService) RegisterSkill(userId int, skill skills.Skills) (skills.Ski
 	newSkill, err := u.userRepo.CreateSkill(userId, skill)
 	return newSkill, err
 }
+
 func (u *UserService) FindPersonWithSkill(userId int, skill string) ([]user.GetUsersWithSkills, error) {
 	// call CreateUser function
 	foundUsers, err := u.userRepo.FindSkilledPerson(userId, skill)
 	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
 	return foundUsers, err
 }
+
 func (u *UserService) RenameSkill(userId int, newSkillName string, newSkillDescription string, skillId int) (skills.Skills, error) {
 	// call CreateUser function
 	renamedSkill, err := u.userRepo.RenameSkill(userId, newSkillName, newSkillDescription, skillId)
 	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
 	return renamedSkill, err
 }
+
 func (u *UserService) DeleteSkill(userId int, skillId int) (skills.Skills, error) {
 	// call CreateUser function
 	deletedSkill, err := u.userRepo.DeleteSkill(userId, skillId)
 	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
 	return deletedSkill, err
+}
+
+func (u *UserService) SetActive(userId int, skillId int) (skills.Skills, error) {
+	// call CreateUser function
+	activatedSkill, err := u.userRepo.ActivateSkill(userId, skillId)
+	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
+	return activatedSkill, err
+}
+func (u *UserService) SetInactive(userId int, skillId int) (skills.Skills, error) {
+	// call CreateUser function
+	deactivatedSkill, err := u.userRepo.DectivateSkill(userId, skillId)
+	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
+	return deactivatedSkill, err
 }

@@ -22,14 +22,13 @@ UNIQUE(user_id) --having this wouldn't allow multiple sessions for a user
 
 -- Skills 
 CREATE TYPE skill_status_types AS ENUM('inactive','active');
-CREATE TYPE skill_service_types AS ENUM('needed','offered');
+-- CREATE TYPE skill_service_types AS ENUM('needed','offered');
 CREATE TABLE IF NOT EXISTS skills(
     skill_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(20) NOT NULL,
     description TEXT,
     skill_status skill_status_types DEFAULT 'inactive',
-    skill_service_type skill_service_types DEFAULT 'needed',
     UNIQUE(user_id,name)
 );
 
