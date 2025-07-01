@@ -28,6 +28,7 @@ type GetUserProfile struct {
 
 type GetUsersWithSkills struct {
 	Id               int    `json:"userid"`
+	SkillId          int    `json:"skillid"`
 	Username         string `json:"username"`
 	Email            string `json:"email"`
 	SkillName        string `json:"skillname"`

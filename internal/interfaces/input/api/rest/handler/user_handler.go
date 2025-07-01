@@ -356,7 +356,40 @@ func (u *UserHandler) SetActive(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(activateSkillResponse)
 }
+
 func (u *UserHandler) SetInactive(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value("user").(int)
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
+		return
+	}
+
+	skillIdStr := chi.URLParam(r, "skillId")
+	skillId, err := strconv.Atoi(skillIdStr)
+	if err != nil {
+		http.Error(w, "Invalid skill ID", http.StatusBadRequest)
+		return
+	}
+
+	deactivateSkillResponse, err := u.userService.SetInactive(userId, skillId)
+	if err != nil {
+		fmt.Println("Error after calling FindPersonWithSkill from handler")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// response := foundUsersWithSkill
+	// if len(foundUsersWithSkill) == 0 {
+	// 	response = []user.GetUsersWithSkills{}
+	// }
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(deactivateSkillResponse)
+}
+
+func (u *UserHandler) CreateSession(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value("user").(int)
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)

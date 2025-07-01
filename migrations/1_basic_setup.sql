@@ -21,7 +21,7 @@ UNIQUE(user_id) --having this wouldn't allow multiple sessions for a user
 );
 
 -- Skills 
-CREATE TYPE skill_status_types AS ENUM('inactive','active');
+-- CREATE TYPE IF NOT EXISTS skill_status_types AS ENUM('inactive','active');
 -- CREATE TYPE skill_service_types AS ENUM('needed','offered');
 CREATE TABLE IF NOT EXISTS skills(
     skill_id SERIAL PRIMARY KEY,
@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS skills(
     name VARCHAR(20) NOT NULL,
     description TEXT,
     skill_status skill_status_types DEFAULT 'inactive',
+    min_time_required INT NOT NULL,
     UNIQUE(user_id,name)
 );
 
@@ -42,8 +43,18 @@ value INT NOT NULL,
 transaction_at TIMESTAMPTZ NOT NULL
 );
 
+-- Requests
+CREATE TABLE IF NOT EXISTS requestS(
+    req_id SERIAL PRIMARY KEY,
+    from_user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    to_user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    skill_id INT NOT NULL REFERENCES skills(skill_id) ON DELETE CASCADE,
+    accepted BOOLEAN DEFAULT false,
+    requested_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
 -- TimeBank Service Sessions
-CREATE TYPE session_status_types AS ENUM('created','started','completed','cancelled');
+-- CREATE TYPE session_status_types AS ENUM('created','started','completed','cancelled');
 CREATE TABLE IF NOT EXISTS helping_sessions (
 id SERIAL PRIMARY KEY,
 sender_id INT REFERENCES users(id) ON DELETE SET NULL,

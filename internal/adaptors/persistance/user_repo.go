@@ -101,7 +101,7 @@ func (u *UserRepo) CreateSkill(userId int, newSkill skills.Skills) (skills.Skill
 func (u *UserRepo) FindSkilledPerson(userId int, skillName string) ([]user.GetUsersWithSkills, error) {
 
 	var people []user.GetUsersWithSkills
-	query := "select users.id, users.username, users.email, skills.name, skills.description from users JOIN skills on users.id=skills.user_id where skills.name ILIKE $1 and users.id != $2;"
+	query := "select users.id, users.username, users.email, skills.name,skills.skill_id, skills.description from users JOIN skills on users.id=skills.user_id where skills.name ILIKE $1 and users.id != $2;"
 
 	rows, err := u.db.db.Query(query, "%"+skillName+"%", userId)
 
@@ -114,7 +114,7 @@ func (u *UserRepo) FindSkilledPerson(userId int, skillName string) ([]user.GetUs
 
 	for rows.Next() {
 		var person user.GetUsersWithSkills
-		if err := rows.Scan(&person.Id, &person.Username, &person.Email, &person.SkillName, &person.SkillDescription); err != nil {
+		if err := rows.Scan(&person.Id, &person.Username, &person.Email, &person.SkillName, &person.SkillId, &person.SkillDescription); err != nil {
 			fmt.Println("Error while scanning various rows")
 			return nil, err
 		}
@@ -180,12 +180,10 @@ func (u *UserRepo) ActivateSkill(userId int, skillId int) (skills.Skills, error)
 	if err != nil {
 		return skills.Skills{}, err
 	}
-
 	return activatedSkill, nil
 }
 
 func (u *UserRepo) DectivateSkill(userId int, skillId int) (skills.Skills, error) {
-
 	var deactivatedSkill skills.Skills
 	query := "update skills  set skill_status='inactive' where skill_id= $1 and user_id=$2 returning skill_id,user_id,name,description,skill_status;"
 	err := u.db.db.QueryRow(query, skillId, userId).Scan(
