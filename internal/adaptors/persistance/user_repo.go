@@ -237,6 +237,28 @@ func (u *UserRepo) CreateSession(helpToUserId int, helpFromUserId int, skillShar
 		return helpsession.HelpSession{}, fmt.Errorf("one or both users are not available")
 	}
 
+	// !check if enough credits
+	// ?get credits
+	var availableCredits int64
+	creditQuery := `SELECT available_credits FROM users WHERE id = $1`
+	err = tx.QueryRow(creditQuery, helpToUserId).Scan(&availableCredits)
+	if err != nil {
+		return helpsession.HelpSession{}, fmt.Errorf("failed to get available_credits of helpToUser")
+	}
+
+	// ?get min req credits
+	var minTimeRequired int64
+	minTimeQuery := `SELECT min_time_required FROM skills WHERE skill_id = $1`
+	err = tx.QueryRow(minTimeQuery, skillSharedId).Scan(&minTimeRequired)
+	if err != nil {
+		return helpsession.HelpSession{}, fmt.Errorf("failed to get min_time_required from skill")
+	}
+
+	// ?compare
+	if minTimeRequired > availableCredits {
+		return helpsession.HelpSession{}, fmt.Errorf("user does not have enough credits for the skill")
+	}
+
 	// Insertion in helping_sessions
 	startTime := time.Now()
 	query := `
