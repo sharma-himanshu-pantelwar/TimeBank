@@ -2,6 +2,7 @@ package persistance
 
 import (
 	"fmt"
+	"time"
 	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/skills"
 	user "timebank/internal/core/user"
@@ -84,16 +85,17 @@ func (u *UserRepo) GetUserById(id int) (user.GetUserProfile, error) {
 
 func (u *UserRepo) CreateSkill(userId int, newSkill skills.Skills) (skills.Skills, error) {
 	var id int
-	query := "insert into skills(user_id,name,description,skill_status)values($1, $2, $3, $4) returning skill_id"
+	query := "insert into skills(user_id,name,description,skill_status,min_time_required)values($1, $2, $3, $4,$5) returning skill_id"
 
 	// i need to get the user id from the authenticated user
 
-	err := u.db.db.QueryRow(query, userId, newSkill.Name, newSkill.Description, newSkill.Status).Scan(&id)
+	err := u.db.db.QueryRow(query, userId, newSkill.Name, newSkill.Description, newSkill.Status, newSkill.MinTimeRequired).Scan(&id)
 	if err != nil {
 		return skills.Skills{}, err
 	}
 
 	newSkill.Id = id
+	newSkill.UserId = userId
 	// send values to db
 	return newSkill, nil
 
@@ -212,5 +214,11 @@ func (u *UserRepo) CreateSession(helpToUserId int, helpFromUserId int, skillShar
 	if err != nil {
 		return helpsession.HelpSession{}, err
 	}
+	createdSession.HelpToUserId = helpToUserId
+	createdSession.HelpFromUserId = helpFromUserId
+	createdSession.SkillSharedId = skillSharedId
+	// createdSession.TimeTaken=
+
+	createdSession.StartedAt = time.Now()
 	return createdSession, nil
 }

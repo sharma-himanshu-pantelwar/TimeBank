@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS skills(
     name VARCHAR(20) NOT NULL,
     description TEXT,
     skill_status skill_status_types DEFAULT 'inactive',
-    min_time_required INT NOT NULL,
+    min_time_required INT NOT NULL DEFAULT 0,
     UNIQUE(user_id,name)
 );
 
@@ -63,7 +63,7 @@ skill_shared_id INT REFERENCES skills(skill_id),
 time_taken NUMERIC(4,2) CHECK(time_taken >= 0),
 -- session_status session_status_types DEFAULT 'created',
 -- scheduled_at TIMESTAMPTZ,
-started_at TIMESTAMPTZ,
+started_at TIMESTAMPTZ DEFAULT CURRENT_TIME_STAMP,
 completed_at TIMESTAMPTZ
 -- created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

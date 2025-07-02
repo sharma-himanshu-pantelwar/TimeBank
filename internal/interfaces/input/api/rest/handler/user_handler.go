@@ -193,6 +193,7 @@ func (u *UserHandler) AddSkills(w http.ResponseWriter, r *http.Request) {
 	}
 	var newSkills skills.Skills
 
+	fmt.Println("user id while registration is", userId)
 	if err := json.NewDecoder(r.Body).Decode(&newSkills); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
