@@ -194,3 +194,11 @@ func (u *UserService) GetSessionById(helpToUserId int, sessionId int) (helpsessi
 	fmt.Println("Error is ", err)
 	return session, err
 }
+func (u *UserService) StopSession(userId int, sessionId int) (helpsession.HelpSession, error) {
+	// call CreateUser function
+	// fmt.Println("fromuserId", fromUserId)
+	stoppedSession, err := u.userRepo.StopSession(userId, sessionId)
+	// fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
+	fmt.Println("Error is ", err)
+	return stoppedSession, err
+}

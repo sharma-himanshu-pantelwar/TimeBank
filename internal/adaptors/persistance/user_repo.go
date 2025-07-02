@@ -266,3 +266,14 @@ func (u *UserRepo) GetSessionById(userId int, sessionId int) (helpsession.HelpSe
 
 	return session, nil
 }
+func (u *UserRepo) StopSession(userId int, sessionId int) (helpsession.HelpSession, error) {
+
+	var stoppedSession helpsession.HelpSession
+	query := "update helping_sessions set completed_at=$1 where id=$2 and (sender_id=$3 or receiver_id=$3) returning *;"
+	err := u.db.db.QueryRow(query, time.Now(), sessionId, userId).Scan(&stoppedSession.Id, &stoppedSession.HelpFromUserId, &stoppedSession.HelpToUserId, &stoppedSession.SkillSharedId, &stoppedSession.TimeTaken, &stoppedSession.StartedAt, &stoppedSession.CompletedAt)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	return stoppedSession, nil
+}

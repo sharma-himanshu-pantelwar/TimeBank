@@ -514,3 +514,42 @@ func (u *UserHandler) GetSessionById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(sessionsResponse)
 }
+func (u *UserHandler) StopSession(w http.ResponseWriter, r *http.Request) {
+	var sessionData helpsession.HelpSession
+	userId, ok := r.Context().Value("user").(int)
+	// fmt.Println("user id is ", userId)//2
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
+		return
+	}
+	if err := json.NewDecoder(r.Body).Decode(&sessionData); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	sessionIdStr := chi.URLParam(r, "sessionId")
+	sessionId, err := strconv.Atoi(sessionIdStr)
+	if err != nil {
+		http.Error(w, "Invalid skill ID", http.StatusBadRequest)
+		return
+	}
+
+	stoppedSessionResponse, err := u.userService.StopSession(userId, sessionId)
+
+	if err != nil {
+		// fmt.Println("Error after CreateSession from handler", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// response := foundUsersWithSkill
+	// if len(foundUsersWithSkill) == 0 {
+	// 	response = []user.GetUsersWithSkills{}
+	// }
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(stoppedSessionResponse)
+}
