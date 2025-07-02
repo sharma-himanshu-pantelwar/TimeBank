@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS skills(
 
 -- Time Credits
 CREATE TABLE IF NOT EXISTS time_credits (
-id UUID PRIMARY KEY,
+id SERIAL PRIMARY KEY,
 earned_by INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 spent_by INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 value INT NOT NULL,
@@ -98,3 +98,21 @@ UNIQUE(session_id, rater_id)
 -- BEFORE UPDATE ON users
 -- FOR EACH ROW
 -- EXECUTE FUNCTION prevent_negative_credits();
+
+
+-- CREATE OR REPLACE FUNCTION calculate_time_taken()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--   -- Only calculate if completed_at is being updated
+--   IF NEW.completed_at IS NOT NULL AND OLD.completed_at IS DISTINCT FROM NEW.completed_at THEN
+--     -- time_taken in hours
+--     NEW.time_taken := ROUND(EXTRACT(EPOCH FROM NEW.completed_at - NEW.started_at) / 60, 2);
+--   END IF;
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- CREATE TRIGGER trg_calculate_time_taken
+-- BEFORE UPDATE ON helping_sessions
+-- FOR EACH ROW
+-- EXECUTE FUNCTION calculate_time_taken();

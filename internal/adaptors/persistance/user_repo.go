@@ -239,7 +239,7 @@ func (u *UserRepo) CreateSession(helpToUserId int, helpFromUserId int, skillShar
 
 	// !check if enough credits
 	// ?get credits
-	var availableCredits int64
+	var availableCredits float64
 	creditQuery := `SELECT available_credits FROM users WHERE id = $1`
 	err = tx.QueryRow(creditQuery, helpToUserId).Scan(&availableCredits)
 	if err != nil {
@@ -247,7 +247,7 @@ func (u *UserRepo) CreateSession(helpToUserId int, helpFromUserId int, skillShar
 	}
 
 	// ?get min req credits
-	var minTimeRequired int64
+	var minTimeRequired float64
 	minTimeQuery := `SELECT min_time_required FROM skills WHERE skill_id = $1`
 	err = tx.QueryRow(minTimeQuery, skillSharedId).Scan(&minTimeRequired)
 	if err != nil {
@@ -385,6 +385,26 @@ func (u *UserRepo) StopSession(userId int, sessionId int) (helpsession.HelpSessi
 	}
 
 	_, err = tx.Exec(updateQuery, stoppedSession.HelpToUserId)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	// Credit transfer
+	creditIncrease := `update users set available_credits=available_credits + $1 WHERE id=$2`
+	creditDeduct := `update users set available_credits=available_credits - $1 WHERE id=$2`
+	_, err = tx.Exec(creditIncrease, stoppedSession.TimeTaken, stoppedSession.HelpFromUserId)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+	_, err = tx.Exec(creditDeduct, stoppedSession.TimeTaken, stoppedSession.HelpToUserId)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	timeCreditsInsertionQuery := `INSERT INTO time_credits(earned_by,spent_by,value,transaction_at)	VALUES ($1, $2, $3,$4) RETURNING id;`
+
+	var id int
+	err = tx.QueryRow(timeCreditsInsertionQuery, stoppedSession.HelpFromUserId, stoppedSession.HelpToUserId, stoppedSession.TimeTaken, stoppedSession.CompletedAt).Scan(&id)
 	if err != nil {
 		return helpsession.HelpSession{}, err
 	}
