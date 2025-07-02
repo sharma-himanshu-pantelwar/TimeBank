@@ -202,24 +202,79 @@ func (u *UserRepo) DectivateSkill(userId int, skillId int) (skills.Skills, error
 
 	return deactivatedSkill, nil
 }
+
 func (u *UserRepo) CreateSession(helpToUserId int, helpFromUserId int, skillSharedId int) (helpsession.HelpSession, error) {
 	var createdSession helpsession.HelpSession
 	var id int
-	// fmt.Println("userId", userId)
-	// fmt.Println("fromUserId", fromUserId)
-	query := "insert into helping_sessions(sender_id,receiver_id,skill_shared_id,time_taken,started_at,completed_at)values($1, $2, $3, $4, $5, $6) returning id;"
-	fmt.Println("Skill shared id", skillSharedId)
 
-	err := u.db.db.QueryRow(query, helpFromUserId, helpToUserId, skillSharedId, &createdSession.TimeTaken, &createdSession.StartedAt, &createdSession.CompletedAt).Scan(&id)
+	// Start transaction
+	tx, err := u.db.db.Begin()
 	if err != nil {
 		return helpsession.HelpSession{}, err
 	}
-	createdSession.HelpToUserId = helpToUserId
-	createdSession.HelpFromUserId = helpFromUserId
-	createdSession.SkillSharedId = skillSharedId
-	// createdSession.TimeTaken=
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
 
-	createdSession.StartedAt = time.Now()
+	// Check if both users are available
+	var helpToAvailable, helpFromAvailable string
+	checkAvailabilityQuery := `SELECT availability FROM users where id=$1`
+
+	err = tx.QueryRow(checkAvailabilityQuery, helpToUserId).Scan(&helpToAvailable)
+	if err != nil {
+		return helpsession.HelpSession{}, fmt.Errorf("failed to check if helpToUser is Available")
+
+	}
+	err = tx.QueryRow(checkAvailabilityQuery, helpFromUserId).Scan(&helpFromAvailable)
+	if err != nil {
+		return helpsession.HelpSession{}, fmt.Errorf("failed to check if helpFromUser is Available")
+
+	}
+
+	if helpFromAvailable != "true" || helpToAvailable != "true" {
+		return helpsession.HelpSession{}, fmt.Errorf("one or both users are not available")
+	}
+
+	// Insertion in helping_sessions
+	startTime := time.Now()
+	query := `
+		INSERT INTO helping_sessions(sender_id, receiver_id, skill_shared_id, time_taken, started_at, completed_at)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id;
+	`
+	err = tx.QueryRow(query, helpFromUserId, helpToUserId, skillSharedId, createdSession.TimeTaken, startTime, createdSession.CompletedAt).Scan(&id)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	// Set fields on the session struct
+	createdSession.Id = id
+	createdSession.HelpFromUserId = helpFromUserId
+	createdSession.HelpToUserId = helpToUserId
+	createdSession.SkillSharedId = skillSharedId
+	createdSession.StartedAt = startTime
+	// TimeTaken and CompletedAt assumed to be set via input or remain zero/default
+
+	// update availability for both users
+	updateAvailabilityQuery := `update users set availability='false' where id=$1`
+	_, err = tx.Exec(updateAvailabilityQuery, helpFromUserId)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	_, err = tx.Exec(updateAvailabilityQuery, helpToUserId)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	// Commit transaction
+	err = tx.Commit()
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
 	return createdSession, nil
 }
 
@@ -267,10 +322,52 @@ func (u *UserRepo) GetSessionById(userId int, sessionId int) (helpsession.HelpSe
 	return session, nil
 }
 func (u *UserRepo) StopSession(userId int, sessionId int) (helpsession.HelpSession, error) {
-
 	var stoppedSession helpsession.HelpSession
-	query := "update helping_sessions set completed_at=$1 where id=$2 and (sender_id=$3 or receiver_id=$3) returning *;"
-	err := u.db.db.QueryRow(query, time.Now(), sessionId, userId).Scan(&stoppedSession.Id, &stoppedSession.HelpFromUserId, &stoppedSession.HelpToUserId, &stoppedSession.SkillSharedId, &stoppedSession.TimeTaken, &stoppedSession.StartedAt, &stoppedSession.CompletedAt)
+
+	// start txn
+	tx, err := u.db.db.Begin()
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// finish session
+	query := `UPDATE helping_sessions
+		SET completed_at = $1
+		WHERE id = $2 AND (sender_id = $3 OR receiver_id = $3)
+		RETURNING id, sender_id, receiver_id, skill_shared_id, time_taken, started_at, completed_at;`
+
+	err = tx.QueryRow(query, time.Now(), sessionId, userId).Scan(
+		&stoppedSession.Id,
+		&stoppedSession.HelpFromUserId,
+		&stoppedSession.HelpToUserId,
+		&stoppedSession.SkillSharedId,
+		&stoppedSession.TimeTaken,
+		&stoppedSession.StartedAt,
+		&stoppedSession.CompletedAt,
+	)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	// set both users to available
+	updateQuery := `UPDATE users SET availability = 'true' WHERE id = $1;`
+
+	_, err = tx.Exec(updateQuery, stoppedSession.HelpFromUserId)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	_, err = tx.Exec(updateQuery, stoppedSession.HelpToUserId)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return helpsession.HelpSession{}, err
 	}

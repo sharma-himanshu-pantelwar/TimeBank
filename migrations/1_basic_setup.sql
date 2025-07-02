@@ -5,7 +5,7 @@ username VARCHAR(30) NOT NULL,
 email TEXT UNIQUE NOT NULL,
 password TEXT NOT NULL,
 location VARCHAR(20) NOT NULL,
-availability BOOLEAN DEFAULT false,
+availability BOOLEAN DEFAULT true,
 available_credits INT NOT NULL DEFAULT 0,
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
@@ -44,7 +44,7 @@ transaction_at TIMESTAMPTZ NOT NULL
 );
 
 -- Requests
-CREATE TABLE IF NOT EXISTS requestS(
+CREATE TABLE IF NOT EXISTS requests(
     req_id SERIAL PRIMARY KEY,
     from_user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     to_user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
