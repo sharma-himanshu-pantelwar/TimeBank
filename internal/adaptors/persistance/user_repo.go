@@ -254,3 +254,15 @@ func (u *UserRepo) GetAllSessions(userId int) ([]helpsession.HelpSession, error)
 	return people, nil
 
 }
+
+func (u *UserRepo) GetSessionById(userId int, sessionId int) (helpsession.HelpSession, error) {
+
+	var session helpsession.HelpSession
+	query := "select * from helping_sessions where id=$1 and sender_id=$2 or receiver_id=$2;"
+	err := u.db.db.QueryRow(query, sessionId, userId).Scan(&session.Id, &session.HelpFromUserId, &session.HelpToUserId, &session.SkillSharedId, &session.TimeTaken, &session.StartedAt, &session.CompletedAt)
+	if err != nil {
+		return helpsession.HelpSession{}, err
+	}
+
+	return session, nil
+}
