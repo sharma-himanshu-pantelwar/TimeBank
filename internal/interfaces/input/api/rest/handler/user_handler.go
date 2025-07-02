@@ -393,6 +393,7 @@ func (u *UserHandler) SetInactive(w http.ResponseWriter, r *http.Request) {
 func (u *UserHandler) CreateSession(w http.ResponseWriter, r *http.Request) {
 	var sessionData helpsession.HelpSession
 	userId, ok := r.Context().Value("user").(int)
+	// fmt.Println("user id is ", userId)//2
 
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
@@ -406,10 +407,17 @@ func (u *UserHandler) CreateSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sessionData.HelpToUserId = userId
 	// userId-> logged in user id
-	deactivateSkillResponse, err := u.userService.CreateSession(userId, sessionData.FromUser)
+
+	// fmt.Println("fromUserId", fromUserId)
+	// fmt.Printf("Sending user %v of type %T", userId, userId)
+
+	//fmt.Println("from user", sessionData.FromUser)
+	deactivateSkillResponse, err := u.userService.CreateSession(sessionData.HelpToUserId, sessionData.HelpFromUserId, sessionData.SkillSharedId)
+
 	if err != nil {
-		fmt.Println("Error after calling FindPersonWithSkill from handler")
+		// fmt.Println("Error after CreateSession from handler", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return

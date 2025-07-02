@@ -57,14 +57,14 @@ CREATE TABLE IF NOT EXISTS requestS(
 -- CREATE TYPE session_status_types AS ENUM('created','started','completed','cancelled');
 CREATE TABLE IF NOT EXISTS helping_sessions (
 id SERIAL PRIMARY KEY,
-sender_id INT REFERENCES users(id) ON DELETE SET NULL,
-receiver_id INT REFERENCES users(id) ON DELETE SET NULL,
+sender_id INT REFERENCES users(id) ,
+receiver_id INT REFERENCES users(id),
 skill_shared_id INT REFERENCES skills(skill_id),
 time_taken NUMERIC(4,2) CHECK(time_taken >= 0),
 -- session_status session_status_types DEFAULT 'created',
 -- scheduled_at TIMESTAMPTZ,
 started_at TIMESTAMPTZ,
-completed_at TIMESTAMPTZ,
+completed_at TIMESTAMPTZ
 -- created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -170,9 +170,11 @@ func (u *UserService) SetInactive(userId int, skillId int) (skills.Skills, error
 	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
 	return deactivatedSkill, err
 }
-func (u *UserService) CreateSession(userId int, fromUserId int) (helpsession.HelpSession, error) {
+func (u *UserService) CreateSession(helpToUserId int, helpFromUserId int, skillSharedId int) (helpsession.HelpSession, error) {
 	// call CreateUser function
-	createdSession, err := u.userRepo.CreateSession(userId, fromUserId)
-	// fmt.Println(foundUsers) //empty array recieved in case of no user with that skill
+	// fmt.Println("fromuserId", fromUserId)
+	createdSession, err := u.userRepo.CreateSession(helpToUserId, helpFromUserId, skillSharedId)
+	fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
+	fmt.Println("Error is ", err)
 	return createdSession, err
 }

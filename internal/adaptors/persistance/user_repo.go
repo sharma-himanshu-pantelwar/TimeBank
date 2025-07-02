@@ -200,14 +200,17 @@ func (u *UserRepo) DectivateSkill(userId int, skillId int) (skills.Skills, error
 
 	return deactivatedSkill, nil
 }
-func (u *UserRepo) CreateSession(userId int, fromUserId int) (helpsession.HelpSession, error) {
+func (u *UserRepo) CreateSession(helpToUserId int, helpFromUserId int, skillSharedId int) (helpsession.HelpSession, error) {
 	var createdSession helpsession.HelpSession
 	var id int
+	// fmt.Println("userId", userId)
+	// fmt.Println("fromUserId", fromUserId)
 	query := "insert into helping_sessions(sender_id,receiver_id,skill_shared_id,time_taken,started_at,completed_at)values($1, $2, $3, $4, $5, $6) returning id;"
-	err := u.db.db.QueryRow(query, fromUserId, userId, &createdSession.SkillSharedId, &createdSession.TimeTaken, &createdSession.StartedAt, &createdSession.CompletedAt).Scan(&id)
+	fmt.Println("Skill shared id", skillSharedId)
+
+	err := u.db.db.QueryRow(query, helpFromUserId, helpToUserId, skillSharedId, &createdSession.TimeTaken, &createdSession.StartedAt, &createdSession.CompletedAt).Scan(&id)
 	if err != nil {
 		return helpsession.HelpSession{}, err
 	}
-
 	return createdSession, nil
 }
