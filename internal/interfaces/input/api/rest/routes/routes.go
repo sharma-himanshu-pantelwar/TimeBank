@@ -34,6 +34,7 @@ func InitRoutes(userHandler *userhandler.UserHandler) http.Handler {
 		r.Use(middleware.Authenticate)
 		// r.Post("/request", userHandler.RequestSession)
 		r.Post("/create", userHandler.CreateSession)
+		r.Get("/", userHandler.GetSessions) //to get all sessions for user
 
 	})
 

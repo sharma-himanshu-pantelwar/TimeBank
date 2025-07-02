@@ -3,6 +3,7 @@ package helpsession
 import "time"
 
 type HelpSession struct {
+	Id             int       `json:"sessionId"`
 	HelpToUserId   int       `json:"helpNeededBy"` //this person is getting helped
 	HelpFromUserId int       `json:"helpGivenBy"`  //this person is  helping
 	SkillSharedId  int       `json:"skillSharedId"`

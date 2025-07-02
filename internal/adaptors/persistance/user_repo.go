@@ -222,3 +222,35 @@ func (u *UserRepo) CreateSession(helpToUserId int, helpFromUserId int, skillShar
 	createdSession.StartedAt = time.Now()
 	return createdSession, nil
 }
+
+func (u *UserRepo) GetAllSessions(userId int) ([]helpsession.HelpSession, error) {
+
+	var people []helpsession.HelpSession
+	query := "select * from helping_sessions where receiver_id=$1 or sender_id=$1;"
+
+	rows, err := u.db.db.Query(query, userId)
+
+	if err != nil {
+		fmt.Println("Error while running query        :             ", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var session helpsession.HelpSession
+		if err := rows.Scan(&session.Id, &session.HelpToUserId, &session.HelpFromUserId, &session.SkillSharedId, &session.TimeTaken, &session.StartedAt, &session.CompletedAt); err != nil {
+			fmt.Println("Error while scanning various rows")
+			return nil, err
+		}
+		people = append(people, session)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Println("Error before returning people[]")
+		return nil, err
+	}
+	// fmt.Println(people)  //empty array would go in case of no users found with that skill
+	return people, nil
+
+}

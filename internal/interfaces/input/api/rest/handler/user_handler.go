@@ -432,3 +432,45 @@ func (u *UserHandler) CreateSession(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(deactivateSkillResponse)
 }
+
+func (u *UserHandler) GetSessions(w http.ResponseWriter, r *http.Request) {
+	var sessionData helpsession.HelpSession
+	userId, ok := r.Context().Value("user").(int)
+	// fmt.Println("user id is ", userId)//2
+
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
+		return
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&sessionData); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	sessionData.HelpToUserId = userId
+	// userId-> logged in user id
+
+	// fmt.Println("fromUserId", fromUserId)
+	// fmt.Printf("Sending user %v of type %T", userId, userId)
+
+	//fmt.Println("from user", sessionData.FromUser)
+	allSessionsResponse, err := u.userService.GetAllSessions(sessionData.HelpToUserId)
+
+	if err != nil {
+		// fmt.Println("Error after CreateSession from handler", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// response := foundUsersWithSkill
+	// if len(foundUsersWithSkill) == 0 {
+	// 	response = []user.GetUsersWithSkills{}
+	// }
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(allSessionsResponse)
+}
