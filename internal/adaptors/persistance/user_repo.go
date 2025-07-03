@@ -3,7 +3,7 @@ package persistance
 import (
 	"fmt"
 	"time"
-	feedback "timebank/internal/core/feeback"
+	feedback "timebank/internal/core/feedback"
 	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/skills"
 	user "timebank/internal/core/user"

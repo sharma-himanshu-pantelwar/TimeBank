@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	feedback "timebank/internal/core/feeback"
+	feedback "timebank/internal/core/feedback"
 	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/skills"
 	"timebank/internal/core/user"

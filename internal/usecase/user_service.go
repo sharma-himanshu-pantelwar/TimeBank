@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 	"timebank/internal/adaptors/persistance"
-	feedback "timebank/internal/core/feeback"
+	feedback "timebank/internal/core/feedback"
 	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/session"
 	"timebank/internal/core/skills"
