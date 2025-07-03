@@ -212,7 +212,7 @@ func (u *UserService) SendFeedback(feedbackData feedback.Feedback) (feedback.Fee
 	return stoppedSession, err
 }
 
-func (u *UserService) GetFeedBackForMe(userId int) ([]feedback.Feedback, error) {
+func (u *UserService) GetAllFeedBacks(userId int) ([]feedback.Feedback, error) {
 	// call CreateUser function
 	// fmt.Println("fromuserId", fromUserId)
 	allFeedbacks, err := u.userRepo.GetAllFeedbacks(userId)

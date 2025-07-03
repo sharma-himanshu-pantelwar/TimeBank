@@ -606,7 +606,40 @@ func (u *UserHandler) GetFeedbacksForMe(w http.ResponseWriter, r *http.Request) 
 	// 	return
 	// }
 
-	feedbackDataResponse, err := u.userService.GetFeedBackForMe(userId)
+	feedbackDataResponse, err := u.userService.GetAllFeedBacks(userId)
+	if err != nil {
+		// fmt.Println("Error after CreateSession from handler", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	response := feedbackDataResponse
+	if len(feedbackDataResponse) == 0 {
+		response = []feedback.Feedback{}
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+
+}
+func (u *UserHandler) GetFeedbacksForUser(w http.ResponseWriter, r *http.Request) {
+	// var feedbackData feedback.Feedback
+	_, ok := r.Context().Value("user").(int)
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
+		return
+	}
+
+	feedbackForUserIdStr := chi.URLParam(r, "forUser")
+	feedbackForUserId, err := strconv.Atoi(feedbackForUserIdStr)
+	if err != nil {
+		http.Error(w, "Invalid skill ID", http.StatusBadRequest)
+		return
+	}
+
+	feedbackDataResponse, err := u.userService.GetAllFeedBacks(feedbackForUserId)
 	if err != nil {
 		// fmt.Println("Error after CreateSession from handler", err)
 		w.WriteHeader(http.StatusInternalServerError)

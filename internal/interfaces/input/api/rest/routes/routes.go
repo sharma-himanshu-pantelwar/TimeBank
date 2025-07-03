@@ -43,6 +43,7 @@ func InitRoutes(userHandler *userhandler.UserHandler) http.Handler {
 		r.Use(middleware.Authenticate)
 		r.Post("/give/{feedbackTo}", userHandler.GiveFeedback)
 		r.Get("/", userHandler.GetFeedbacksForMe)
+		r.Get("/{forUser}", userHandler.GetFeedbacksForUser)
 
 	})
 
