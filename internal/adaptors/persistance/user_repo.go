@@ -172,14 +172,16 @@ func (u *UserRepo) DeleteSkill(userId int, skillId int) (skills.Skills, error) {
 func (u *UserRepo) ActivateSkill(userId int, skillId int) (skills.Skills, error) {
 
 	var activatedSkill skills.Skills
-	query := "update skills  set skill_status='active' where skill_id= $1 and user_id=$2 returning skill_id,user_id,name,description,skill_status;"
+	query := "update skills  set skill_status='active' where skill_id= $1 and user_id=$2 returning skill_id,user_id,name,description,skill_status,min_time_required;"
 	err := u.db.db.QueryRow(query, skillId, userId).Scan(
 		&activatedSkill.Id,
 		&activatedSkill.UserId,
 		&activatedSkill.Name,
 		&activatedSkill.Description,
 		&activatedSkill.Status,
+		&activatedSkill.MinTimeRequired,
 	)
+
 	if err != nil {
 		return skills.Skills{}, err
 	}
@@ -188,13 +190,14 @@ func (u *UserRepo) ActivateSkill(userId int, skillId int) (skills.Skills, error)
 
 func (u *UserRepo) DectivateSkill(userId int, skillId int) (skills.Skills, error) {
 	var deactivatedSkill skills.Skills
-	query := "update skills  set skill_status='inactive' where skill_id= $1 and user_id=$2 returning skill_id,user_id,name,description,skill_status;"
+	query := "update skills  set skill_status='inactive' where skill_id= $1 and user_id=$2 returning skill_id,user_id,name,description,skill_status,min_time_required;"
 	err := u.db.db.QueryRow(query, skillId, userId).Scan(
 		&deactivatedSkill.Id,
 		&deactivatedSkill.UserId,
 		&deactivatedSkill.Name,
 		&deactivatedSkill.Description,
 		&deactivatedSkill.Status,
+		&deactivatedSkill.MinTimeRequired,
 	)
 	if err != nil {
 		return skills.Skills{}, err
@@ -343,6 +346,7 @@ func (u *UserRepo) GetSessionById(userId int, sessionId int) (helpsession.HelpSe
 
 	return session, nil
 }
+
 func (u *UserRepo) StopSession(userId int, sessionId int) (helpsession.HelpSession, error) {
 	var stoppedSession helpsession.HelpSession
 

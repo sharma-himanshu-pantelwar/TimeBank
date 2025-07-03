@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 	"timebank/pkg/sqlparser"
 )
 
@@ -108,16 +109,16 @@ func (m *Migrate) parseFilesAndMigrateDb() error {
 		}
 
 		content := string(bytes)
-		// if strings.Contains(content, "CREATE OR REPLACE") || strings.Contains(content, "CREATE FUNCTION") {
-		// 	fmt.Println("Bypassing function/trigger,", file.Dir.Name())
+		if strings.Contains(content, "CREATE OR REPLACE") || strings.Contains(content, "CREATE FUNCTION") {
+			fmt.Println("Bypassing function/trigger,", file.Dir.Name())
 
-		// 	_, err := m.txn.Exec(content)
-		// 	if err != nil {
-		// 		fmt.Println("Error in bypassing :", err)
-		// 		return err
-		// 	}
-		// 	continue
-		// }
+			_, err := m.txn.Exec(content)
+			if err != nil {
+				fmt.Println("Error in bypassing :", err)
+				return err
+			}
+			continue
+		}
 		commands := sqlparser.ParseSqlFile(content)
 		for _, command := range commands {
 			_, err = m.txn.Exec(command)
