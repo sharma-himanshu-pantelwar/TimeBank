@@ -416,6 +416,13 @@ func (u *UserHandler) CreateSession(w http.ResponseWriter, r *http.Request) {
 	// fmt.Printf("Sending user %v of type %T", userId, userId)
 
 	//fmt.Println("from user", sessionData.FromUser)
+	if sessionData.HelpFromUserId == sessionData.HelpToUserId {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode("user can not take help from himself")
+		return
+	}
+
 	deactivateSkillResponse, err := u.userService.CreateSession(sessionData.HelpToUserId, sessionData.HelpFromUserId, sessionData.SkillSharedId)
 
 	if err != nil {

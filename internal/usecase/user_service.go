@@ -175,16 +175,27 @@ func (u *UserService) CreateSession(helpToUserId int, helpFromUserId int, skillS
 	// call CreateUser function
 	// fmt.Println("fromuserId", fromUserId)
 	createdSession, err := u.userRepo.CreateSession(helpToUserId, helpFromUserId, skillSharedId)
-	fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
-	fmt.Println("Error is ", err)
+	if err != nil {
+		return helpsession.HelpSession{}, nil
+	}
+
+	fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that
+
+	//go routine to run and show this for corresponding go routine session reciever helper creditsOfRec
+
+	// go routine to manage credits per second
+
 	return createdSession, err
 }
+
+// function to manage credits per minute
+
 func (u *UserService) GetAllSessions(helpToUserId int) ([]helpsession.HelpSession, error) {
 	// call CreateUser function
 	// fmt.Println("fromuserId", fromUserId)
 	allSessions, err := u.userRepo.GetAllSessions(helpToUserId)
 	// fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
-	fmt.Println("Error is ", err)
+	// fmt.Println("Error is ", err)
 	return allSessions, err
 }
 func (u *UserService) GetSessionById(helpToUserId int, sessionId int) (helpsession.HelpSession, error) {
@@ -192,7 +203,7 @@ func (u *UserService) GetSessionById(helpToUserId int, sessionId int) (helpsessi
 	// fmt.Println("fromuserId", fromUserId)
 	session, err := u.userRepo.GetSessionById(helpToUserId, sessionId)
 	// fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
-	fmt.Println("Error is ", err)
+	// fmt.Println("Error is ", err)
 	return session, err
 }
 func (u *UserService) StopSession(userId int, sessionId int) (helpsession.HelpSession, error) {
@@ -200,7 +211,7 @@ func (u *UserService) StopSession(userId int, sessionId int) (helpsession.HelpSe
 	// fmt.Println("fromuserId", fromUserId)
 	stoppedSession, err := u.userRepo.StopSession(userId, sessionId)
 	// fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
-	fmt.Println("Error is ", err)
+	// fmt.Println("Error is ", err)
 	return stoppedSession, err
 }
 func (u *UserService) SendFeedback(feedbackData feedback.Feedback) (feedback.Feedback, error) {
@@ -208,7 +219,7 @@ func (u *UserService) SendFeedback(feedbackData feedback.Feedback) (feedback.Fee
 	// fmt.Println("fromuserId", fromUserId)
 	stoppedSession, err := u.userRepo.SendFeedback(feedbackData)
 	// fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
-	fmt.Println("Error is ", err)
+	// fmt.Println("Error is ", err)
 	return stoppedSession, err
 }
 
@@ -217,6 +228,6 @@ func (u *UserService) GetAllFeedBacks(userId int) ([]feedback.Feedback, error) {
 	// fmt.Println("fromuserId", fromUserId)
 	allFeedbacks, err := u.userRepo.GetAllFeedbacks(userId)
 	// fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
-	fmt.Println("Error is ", err)
+	// fmt.Println("Error is ", err)
 	return allFeedbacks, err
 }
