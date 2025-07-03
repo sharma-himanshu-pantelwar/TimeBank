@@ -3,6 +3,7 @@ package persistance
 import (
 	"fmt"
 	"time"
+	feedback "timebank/internal/core/feeback"
 	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/skills"
 	user "timebank/internal/core/user"
@@ -419,4 +420,21 @@ func (u *UserRepo) StopSession(userId int, sessionId int) (helpsession.HelpSessi
 	}
 
 	return stoppedSession, nil
+}
+
+func (u *UserRepo) SendFeedback(feedbackData feedback.Feedback) (feedback.Feedback, error) {
+	var id int
+	query := "insert into feedback(session_id,rater_id,ratee_id,rating,comments,created_at)values($1, $2, $3, $4,$5,$6) returning id"
+
+	// i need to get the user id from the authenticated user
+
+	err := u.db.db.QueryRow(query, feedbackData.SessionId, feedbackData.RaterId, feedbackData.RateeId, feedbackData.Rating, feedbackData.Comments, time.Now()).Scan(&id)
+	if err != nil {
+		return feedback.Feedback{}, err
+	}
+
+	feedbackData.Id = id
+	feedbackData.CreatedAt = time.Now()
+	return feedbackData, nil
+
 }

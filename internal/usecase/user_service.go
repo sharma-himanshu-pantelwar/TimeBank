@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 	"timebank/internal/adaptors/persistance"
+	feedback "timebank/internal/core/feeback"
 	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/session"
 	"timebank/internal/core/skills"
@@ -198,6 +199,14 @@ func (u *UserService) StopSession(userId int, sessionId int) (helpsession.HelpSe
 	// call CreateUser function
 	// fmt.Println("fromuserId", fromUserId)
 	stoppedSession, err := u.userRepo.StopSession(userId, sessionId)
+	// fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
+	fmt.Println("Error is ", err)
+	return stoppedSession, err
+}
+func (u *UserService) SendFeedback(feedbackData feedback.Feedback) (feedback.Feedback, error) {
+	// call CreateUser function
+	// fmt.Println("fromuserId", fromUserId)
+	stoppedSession, err := u.userRepo.SendFeedback(feedbackData)
 	// fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
 	fmt.Println("Error is ", err)
 	return stoppedSession, err

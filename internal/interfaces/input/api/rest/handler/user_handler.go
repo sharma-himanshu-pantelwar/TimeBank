@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	feedback "timebank/internal/core/feeback"
 	helpsession "timebank/internal/core/help_session"
 	"timebank/internal/core/skills"
 	"timebank/internal/core/user"
@@ -552,4 +553,41 @@ func (u *UserHandler) StopSession(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stoppedSessionResponse)
+}
+
+func (u *UserHandler) GiveFeedback(w http.ResponseWriter, r *http.Request) {
+	var feedbackData feedback.Feedback
+	userId, ok := r.Context().Value("user").(int)
+	// fmt.Println("user id is ", userId)//2
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
+		return
+	}
+	if err := json.NewDecoder(r.Body).Decode(&feedbackData); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	rateeIdStr := chi.URLParam(r, "feedbackTo")
+	rateeId, err := strconv.Atoi(rateeIdStr)
+	if err != nil {
+		http.Error(w, "Invalid skill ID", http.StatusBadRequest)
+		return
+	}
+
+	feedbackData.RateeId = rateeId
+	feedbackData.RaterId = userId
+	feedbackDataResponse, err := u.userService.SendFeedback(feedbackData)
+	if err != nil {
+		// fmt.Println("Error after CreateSession from handler", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(feedbackDataResponse)
+
 }

@@ -35,8 +35,13 @@ func InitRoutes(userHandler *userhandler.UserHandler) http.Handler {
 		// r.Post("/request", userHandler.RequestSession)
 		r.Post("/create", userHandler.CreateSession)
 		r.Get("/", userHandler.GetSessions)                  //to get all sessions for user
-		r.Get("/{sessionId}", userHandler.GetSessionById)    //to get all sessions for user
-		r.Post("/stop/{sessionId}", userHandler.StopSession) //to get all sessions for user
+		r.Get("/{sessionId}", userHandler.GetSessionById)    //to get sessions by id
+		r.Post("/stop/{sessionId}", userHandler.StopSession) //to stopSession
+
+	})
+	router.Route("/v1/feedback", func(r chi.Router) {
+		r.Use(middleware.Authenticate)
+		r.Post("/give/{feedbackTo}", userHandler.GiveFeedback)
 
 	})
 
