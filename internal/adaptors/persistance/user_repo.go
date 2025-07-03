@@ -438,3 +438,34 @@ func (u *UserRepo) SendFeedback(feedbackData feedback.Feedback) (feedback.Feedba
 	return feedbackData, nil
 
 }
+
+func (u *UserRepo) GetAllFeedbacks(userId int) ([]feedback.Feedback, error) {
+	var feedbacks []feedback.Feedback
+	query := "select * from feedback where ratee_id=$1;"
+
+	rows, err := u.db.db.Query(query, userId)
+
+	if err != nil {
+		fmt.Println("Error while running query        :             ", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var feedback feedback.Feedback
+		if err := rows.Scan(&feedback.Id, &feedback.SessionId, &feedback.RaterId, &feedback.RateeId, &feedback.Rating, &feedback.Comments, &feedback.CreatedAt); err != nil {
+			fmt.Println("Error while scanning various rows")
+			return nil, err
+		}
+		feedbacks = append(feedbacks, feedback)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Println("Error before returning people[]")
+		return nil, err
+	}
+
+	return feedbacks, nil
+
+}

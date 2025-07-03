@@ -591,3 +591,35 @@ func (u *UserHandler) GiveFeedback(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(feedbackDataResponse)
 
 }
+func (u *UserHandler) GetFeedbacksForMe(w http.ResponseWriter, r *http.Request) {
+	// var feedbackData feedback.Feedback
+	userId, ok := r.Context().Value("user").(int)
+	// fmt.Println("user id is ", userId)//2
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": "user not found in context"})
+		return
+	}
+	// if err := json.NewDecoder(r.Body).Decode(&feedbackData); err != nil {
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	w.Write([]byte(err.Error()))
+	// 	return
+	// }
+
+	feedbackDataResponse, err := u.userService.GetFeedBackForMe(userId)
+	if err != nil {
+		// fmt.Println("Error after CreateSession from handler", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	response := feedbackDataResponse
+	if len(feedbackDataResponse) == 0 {
+		response = []feedback.Feedback{}
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+
+}

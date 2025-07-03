@@ -211,3 +211,12 @@ func (u *UserService) SendFeedback(feedbackData feedback.Feedback) (feedback.Fee
 	fmt.Println("Error is ", err)
 	return stoppedSession, err
 }
+
+func (u *UserService) GetFeedBackForMe(userId int) ([]feedback.Feedback, error) {
+	// call CreateUser function
+	// fmt.Println("fromuserId", fromUserId)
+	allFeedbacks, err := u.userRepo.GetAllFeedbacks(userId)
+	// fmt.Println("created session is ", createdSession) //empty array recieved in case of no user with that skill
+	fmt.Println("Error is ", err)
+	return allFeedbacks, err
+}
